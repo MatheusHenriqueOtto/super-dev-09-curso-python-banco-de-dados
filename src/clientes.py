@@ -31,10 +31,12 @@ def verificar_int(mensagem: str) -> int:
 
 
 def validar_tamanho_str(tamanho: int, mensagem: str) -> str:
-    resposta = input(mensagem)
-    while len(resposta) > tamanho:
-        print(f"A resposta tem que ter no maximo: {tamanho} caracteres")
-        resposta = input(mensagem)
+    resposta = input(mensagem).strip()
+    while len(resposta) > tamanho or len(resposta) < 3:
+        print(f"A resposta tem que ter no maximo {tamanho} caracteres e no minimo 3")
+        resposta = input(mensagem).strip()
 
     return resposta
+
+
 
