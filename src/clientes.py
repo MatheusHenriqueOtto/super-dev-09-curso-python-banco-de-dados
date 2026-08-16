@@ -20,3 +20,13 @@ def conectar_banco():
 
 def limpar_terminal():
     os.system("cls" if os.name == "nt" else "clear")
+
+
+def verificar_int(mensagem: str) -> int:
+    while True:
+        try:
+            return int(input(mensagem))
+        except ValueError:
+            print("Digite um número inteiro válido.")
+
+            
