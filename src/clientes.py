@@ -1,3 +1,4 @@
+from binascii import Error
 import os
 
 from mysql import connector
@@ -37,6 +38,51 @@ def validar_tamanho_str(tamanho_maximo: int, mensagem: str, tamanho_minimo: int 
         resposta = input(mensagem).strip()
 
     return resposta
+
+
+def cadastrar():
+    print("\n====== CADASTRAR CLIENTE ======")
+
+    nome = validar_tamanho_str(255, "Nome: ")
+    documento = validar_tamanho_str(18, "CPF: ")
+    telefone = validar_tamanho_str(15, "Telefone: ", tamanho_minimo=11)
+
+    conexao = None
+    cursor = None
+
+    try: 
+        conexao = conectar_banco()
+        cursor = conexao.cursor()
+
+        sql = """
+        INSERT INTO clientes
+        (nome, documento, telefone)
+        VALUES (%s, %s, %s)
+        """
+
+        cursor.execute(
+            sql,
+            (
+                nome,
+                documento,
+                telefone,
+            ),
+        )
+
+        conexao.commit()
+
+        print(f"\n[OK]Deu boa, o cliente foi criado com o ID: {cursor.lastrowid}")
+
+    except Error as erro:
+        print(f"\n[ERRO]Não deu boa, ao tentar cadastrar o cliente ocorreu {erro}")
+
+    finally:
+        if cursor:
+            cursor.close()
+
+        if conexao and conexao.is_connected():
+            conexao.close()
+
 
 
 
