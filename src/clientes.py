@@ -157,4 +157,38 @@ def listar_clientes():
             conexao.close()
 
 
+def execluir_cliente():
+    listar_clientes()
+
+    id_deletar = verificar_int(
+        "\nDigite o ID do cliente a ser removido: "
+    )
+
+    conexao = None
+    cursor = None
+
+    try:
+        conexao = conectar_banco()
+        cursor = conexao.cursor()
+
+        cursor.execute(
+            "DELETE FROM clientes WHERE id = %s",
+            (id_deletar,),
+        )
+        if cursor.rowcount == 0:
+            print("\nCliente não encontrado.")
+        else:
+            print("\nCliente removido com sucesso")
+
+    except Error as erro:
+        print("\n[Erro]Não deu boa ao tentar deletar um cliente, ocorreu o erro: {erro}")
+
+    finally:
+        if cursor:
+            cursor.close()
+
+        if conexao and conexao.is_connected():
+            conexao.close()
+
+
 
