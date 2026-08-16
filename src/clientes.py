@@ -1,5 +1,6 @@
 from binascii import Error
 import os
+from typing import cast
 
 from mysql import connector
 
@@ -83,6 +84,77 @@ def cadastrar():
         if conexao and conexao.is_connected():
             conexao.close()
 
+
+def listar_clientes():
+    conexao = None
+    cursor = None
+
+    try:
+        conexao = conectar_banco()
+        cursor = conexao.cursor()
+
+        cursor.execute(
+            """
+            SELECT
+                id,
+                nome,
+                documento,
+                telefone
+            FROM clientes
+            ORDER BY nome ASC
+            """
+        )
+
+        clientes = cast(
+            list[
+                tuple[
+                    int,
+                    str,
+                    str,
+                    str
+                ]
+            ],
+            cursor.fetchall(),
+        )
+
+        if not clientes:
+            print("\nNenhum cliente cadastrado.")
+            return
+
+        print("-" * 100)
+        print(
+            f"{'ID':5}"
+            f"{'NOME':<30}"
+            f"{'DOCUMENTO':<20}"
+            f"{'TELEFONE':<20}"
+        )
+        print("-" * 100)
+
+        for cliente in clientes:
+
+            id_cli = cliente[0]
+            nome = cliente[1]
+            documento = cliente[2]
+            telefone = cliente[3]
+
+            print(
+                f"{id_cli:<5}"
+                f"{nome:<30}"
+                f"{documento:<20}"
+                f"{telefone:<20}"
+            )
+
+        print("-" * 100)
+
+    except Error as erro:
+        print(f"\n[ERRO]Não de boa ao listar os clientes, ocorreu esse erro: {erro}")
+
+    finally:
+        if cursor:
+            cursor.close()
+
+        if conexao and conexao.is_connected():
+            conexao.close()
 
 
 
