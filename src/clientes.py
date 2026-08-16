@@ -45,7 +45,7 @@ def cadastrar():
     print("\n====== CADASTRAR CLIENTE ======")
 
     nome = validar_tamanho_str(255, "Nome: ")
-    documento = validar_tamanho_str(18, "CPF: "tamanho_minimo=12)
+    documento = validar_tamanho_str(18, "CPF: ", tamanho_minimo=12)
     telefone = validar_tamanho_str(15, "Telefone: ", tamanho_minimo=11)
 
     conexao = None
@@ -245,6 +245,51 @@ def alterar_cliente():
 
         if conexao and conexao.is_connected():
             conexao.close()
-
-
     
+
+def menu_cliente():
+    while True:
+        print(
+            """
+==============================
+ SISTEMA DE CLIENTES
+==============================
+
+1 - Listar Clientes
+2 - Cadastrar Cliente
+3 - Alterar Cliente
+4 - Excluir Cliente
+5 - Limpar Tela
+0 - Sair
+""" 
+        )
+
+        opcao = verificar_int("Escolha uma opção: ")
+
+        match opcao:
+            case 1:
+                listar_clientes()
+
+            case 2:
+                cadastrar()
+
+            case 3:
+                alterar_cliente()
+
+            case 4:
+                execluir_cliente()
+
+            case 5:
+                limpar_terminal()
+
+            case 0:
+                print("\nEncerrando sistema...")
+                break
+            
+            case _:
+                print("\nOpção inválida.")
+            
+        input("\nPressione ENTER para continuar...")
+        limpar_terminal()
+
+        
