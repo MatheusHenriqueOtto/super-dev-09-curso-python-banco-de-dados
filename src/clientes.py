@@ -1,3 +1,5 @@
+import os
+
 from mysql import connector
 
 BANCO = "restau_cabresa"
@@ -16,3 +18,5 @@ def conectar_banco():
     )
     return conexao
 
+def limpar_terminal():
+    os.system("cls" if os.name == "nt" else "clear")
