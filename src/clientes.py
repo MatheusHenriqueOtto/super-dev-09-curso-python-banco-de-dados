@@ -45,7 +45,7 @@ def cadastrar():
     print("\n====== CADASTRAR CLIENTE ======")
 
     nome = validar_tamanho_str(255, "Nome: ")
-    documento = validar_tamanho_str(18, "CPF: ")
+    documento = validar_tamanho_str(18, "CPF: "tamanho_minimo=12)
     telefone = validar_tamanho_str(15, "Telefone: ", tamanho_minimo=11)
 
     conexao = None
@@ -191,4 +191,60 @@ def execluir_cliente():
             conexao.close()
 
 
+def alterar_cliente():
+    listar_clientes()
 
+    print("\n===== ALTERAR CLIENTE =====")
+
+    id_alterar = verificar_int(
+        "Digite o ID do funcionario: "
+    )
+
+    nome = validar_tamanho_str(255, "Nome: ")
+    documento = validar_tamanho_str(18, "CPF: ", tamanho_minimo=12)
+    telefone = validar_tamanho_str(15, "Telefone: ", tamanho_minimo=10)
+
+    conexao = None
+    cursor = None
+
+    try: 
+        conexao = conectar_banco()
+        cursor = conexao.cursor()
+
+        sql = """
+        UPDATE clientes
+        SET
+            nome = %s,
+            documento = %s,
+            telefone = %s
+        WHERE id = %s
+        """
+
+        cursor.execute(
+            sql,
+            (
+                nome,
+                documento,
+                telefone
+            ),
+        )
+
+        conexao.commit()
+
+        if cursor.rowcount == 0:
+            print("\nCliente não encontrado.")
+        else:
+            print("\nCliente alterado com sucesso")
+
+    except Error as erro:
+        print("\n[Erro]Não deu boa ao tentar alterar um cliente, ocorreu o erro: {erro}")
+
+    finally:
+        if cursor:
+            cursor.close()
+
+        if conexao and conexao.is_connected():
+            conexao.close()
+
+
+    
