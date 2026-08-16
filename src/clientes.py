@@ -29,4 +29,12 @@ def verificar_int(mensagem: str) -> int:
         except ValueError:
             print("Digite um número inteiro válido.")
 
-            
+
+def validar_tamanho_str(tamanho: int, mensagem: str) -> str:
+    resposta = input(mensagem)
+    while len(resposta) > tamanho:
+        print(f"A resposta tem que ter no maximo: {tamanho} caracteres")
+        resposta = input(mensagem)
+
+    return resposta
+
