@@ -133,5 +133,3 @@ def menu_mesa():
         print("\n")
  
         opcao = int(input(mensagem))
- 
-menu_mesa()

@@ -137,5 +137,3 @@ def menu_bebida():
  
         opcao = int(input(mensagem))
  
-menu_bebida()
- 
