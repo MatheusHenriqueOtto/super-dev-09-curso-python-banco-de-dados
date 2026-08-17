@@ -1,25 +1,27 @@
-from binascii import Error
+from mysql.connector import Error
 import os
 from typing import cast
 from mysql import connector
 
-BANCO = "restau_cabresa"
+BANCO = "restau_calabresa"
+USUARIO = "root"
 SENHA = "admin"
 PORTA = 3306
-USUARIO = "root"
 HOST = "127.0.0.1"
+
 
 def conectar_banco():
     conexao = connector.connect(
-        host=HOST,
-        port=PORTA,
-        password=SENHA,
+        database=BANCO,
         user=USUARIO,
-        database=BANCO
+        password=SENHA,
+        port=PORTA,
+        host=HOST
     )
     return conexao
 
-def limpar_terminal():
+
+def limpar_terminal() -> None:
     os.system("cls" if os.name == "nt" else "clear")
 
 
@@ -28,29 +30,50 @@ def verificar_int(mensagem: str) -> int:
         try:
             return int(input(mensagem))
         except ValueError:
-            print("Digite um número inteiro válido.")
+            print("Digite um numero inteiro valido!")
 
 
-def validar_tamanho_str(tamanho_maximo: int, mensagem: str, tamanho_minimo: int = 3) -> str:
+def validar_tamanho_str(
+    tamanho_maximo: int,
+    mensagem: str,
+    tamanho_minimo: int = 3
+) -> str:
     resposta = input(mensagem).strip()
-    while len(resposta) > tamanho_maximo or len(resposta) < tamanho_minimo:
-        print(f"A resposta tem que ter no maximo {tamanho_maximo} caracteres e no minimo {tamanho_minimo}")
+
+    while (
+        len(resposta) > tamanho_maximo
+        or len(resposta) < tamanho_minimo
+    ):
+        print(
+            f"A resposta tem que ter no maximo {tamanho_maximo} caracteres "
+            f"e no minimo {tamanho_minimo}"
+        )
         resposta = input(mensagem).strip()
 
     return resposta
 
 
-def cadastrar():
+def cadastrar() -> None:
     print("\n====== CADASTRAR CLIENTE ======")
 
     nome = validar_tamanho_str(255, "Nome: ")
-    documento = validar_tamanho_str(18, "CPF: ", tamanho_minimo=12)
-    telefone = validar_tamanho_str(15, "Telefone: ", tamanho_minimo=11)
+
+    documento = validar_tamanho_str(
+        18,
+        "CPF: ",
+        tamanho_minimo=11
+    )
+
+    telefone = validar_tamanho_str(
+        15,
+        "Telefone: ",
+        tamanho_minimo=10
+    )
 
     conexao = None
     cursor = None
 
-    try: 
+    try:
         conexao = conectar_banco()
         cursor = conexao.cursor()
 
@@ -71,10 +94,16 @@ def cadastrar():
 
         conexao.commit()
 
-        print(f"\n[OK]Deu boa, o cliente foi criado com o ID: {cursor.lastrowid}")
+        print(
+            f"\n[OK]Deu boa, o cliente foi criado com o ID: "
+            f"{cursor.lastrowid}"
+        )
 
     except Error as erro:
-        print(f"\n[ERRO]Não deu boa, ao tentar cadastrar o cliente ocorreu {erro}")
+        print(
+            f"\n[ERRO]Não deu boa, ao tentar cadastrar o cliente "
+            f"ocorreu {erro}"
+        )
 
     finally:
         if cursor:
@@ -84,7 +113,7 @@ def cadastrar():
             conexao.close()
 
 
-def listar_clientes():
+def listar_clientes() -> None:
     conexao = None
     cursor = None
 
@@ -122,23 +151,22 @@ def listar_clientes():
 
         print("-" * 100)
         print(
-            f"{'ID':5}"
-            f"{'NOME':<30}"
-            f"{'DOCUMENTO':<20}"
+            f"{'ID':<5}"
+            f"{'NOME':<35}"
+            f"{'CPF':<20}"
             f"{'TELEFONE':<20}"
         )
         print("-" * 100)
 
         for cliente in clientes:
-
-            id_cli = cliente[0]
+            id_cliente = cliente[0]
             nome = cliente[1]
             documento = cliente[2]
             telefone = cliente[3]
 
             print(
-                f"{id_cli:<5}"
-                f"{nome:<30}"
+                f"{id_cliente:<5}"
+                f"{nome:<35}"
                 f"{documento:<20}"
                 f"{telefone:<20}"
             )
@@ -146,7 +174,10 @@ def listar_clientes():
         print("-" * 100)
 
     except Error as erro:
-        print(f"\n[ERRO]Não de boa ao listar os clientes, ocorreu esse erro: {erro}")
+        print(
+            f"\n[ERRO]Não deu boa ao listar os clientes, "
+            f"ocorreu esse erro: {erro}"
+        )
 
     finally:
         if cursor:
@@ -156,7 +187,7 @@ def listar_clientes():
             conexao.close()
 
 
-def execluir_cliente():
+def excluir_cliente() -> None:
     listar_clientes()
 
     id_deletar = verificar_int(
@@ -174,13 +205,19 @@ def execluir_cliente():
             "DELETE FROM clientes WHERE id = %s",
             (id_deletar,),
         )
+
+        conexao.commit()
+
         if cursor.rowcount == 0:
             print("\nCliente não encontrado.")
         else:
             print("\nCliente removido com sucesso")
 
     except Error as erro:
-        print("\n[Erro]Não deu boa ao tentar deletar um cliente, ocorreu o erro: {erro}")
+        print(
+            f"\n[Erro]Não deu boa ao tentar deletar um cliente, "
+            f"ocorreu o erro: {erro}"
+        )
 
     finally:
         if cursor:
@@ -190,23 +227,33 @@ def execluir_cliente():
             conexao.close()
 
 
-def alterar_cliente():
+def alterar_cliente() -> None:
     listar_clientes()
 
     print("\n===== ALTERAR CLIENTE =====")
 
     id_alterar = verificar_int(
-        "Digite o ID do funcionario: "
+        "Digite o ID do cliente: "
     )
 
     nome = validar_tamanho_str(255, "Nome: ")
-    documento = validar_tamanho_str(18, "CPF: ", tamanho_minimo=12)
-    telefone = validar_tamanho_str(15, "Telefone: ", tamanho_minimo=10)
+
+    documento = validar_tamanho_str(
+        18,
+        "CPF: ",
+        tamanho_minimo=11
+    )
+
+    telefone = validar_tamanho_str(
+        15,
+        "Telefone: ",
+        tamanho_minimo=10
+    )
 
     conexao = None
     cursor = None
 
-    try: 
+    try:
         conexao = conectar_banco()
         cursor = conexao.cursor()
 
@@ -224,7 +271,8 @@ def alterar_cliente():
             (
                 nome,
                 documento,
-                telefone
+                telefone,
+                id_alterar,
             ),
         )
 
@@ -236,7 +284,10 @@ def alterar_cliente():
             print("\nCliente alterado com sucesso")
 
     except Error as erro:
-        print("\n[Erro]Não deu boa ao tentar alterar um cliente, ocorreu o erro: {erro}")
+        print(
+            f"\n[Erro]Não deu boa ao tentar alterar um cliente, "
+            f"ocorreu o erro: {erro}"
+        )
 
     finally:
         if cursor:
@@ -244,10 +295,12 @@ def alterar_cliente():
 
         if conexao and conexao.is_connected():
             conexao.close()
-    
+
 
 def menu_cliente():
+
     while True:
+
         print(
             """
 ==============================
@@ -260,7 +313,8 @@ def menu_cliente():
 4 - Excluir Cliente
 5 - Limpar Tela
 0 - Sair
-""" 
+
+"""
         )
 
         opcao = verificar_int("Escolha uma opção: ")
@@ -276,7 +330,7 @@ def menu_cliente():
                 alterar_cliente()
 
             case 4:
-                execluir_cliente()
+                excluir_cliente()
 
             case 5:
                 limpar_terminal()
@@ -284,11 +338,10 @@ def menu_cliente():
             case 0:
                 print("\nEncerrando sistema...")
                 break
-            
+
             case _:
                 print("\nOpção inválida.")
-            
+
         input("\nPressione ENTER para continuar...")
         limpar_terminal()
 
-        
