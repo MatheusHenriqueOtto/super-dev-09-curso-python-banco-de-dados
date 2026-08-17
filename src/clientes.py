@@ -1,7 +1,6 @@
 from binascii import Error
 import os
 from typing import cast
-
 from mysql import connector
 
 BANCO = "restau_cabresa"
